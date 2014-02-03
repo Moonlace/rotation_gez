@@ -8,8 +8,9 @@ public class EnemyMoveAround : MonoBehaviour {
 	public float originDistance;
 	public int numberOfEnemies;
 
-
-	private int currentEnemies;
+	private GameObject[] spawnedEnemies;
+	private int spawnedEnemiesCount;
+	private int compledEnemiesCount;
 	private Hashtable p1;
 	private Hashtable p2;
 	private Hashtable p3;
@@ -24,7 +25,9 @@ public class EnemyMoveAround : MonoBehaviour {
 	// set the enemy position
 	// spawn a enemy
 	void Start () {
-		currentEnemies = 0;
+		spawnedEnemies = new GameObject[numberOfEnemies];
+		spawnedEnemiesCount = 0;
+		compledEnemiesCount = 0;
 		this.setEnemyPath ();
 		this.spawnEnemy ();
 	}
@@ -44,7 +47,6 @@ public class EnemyMoveAround : MonoBehaviour {
 		p2 = createPath (p2, botLeft, 2, false, false);
 		p3 = createPath (p3, botRight, 3, false, false);
 		p4 = createPath (p4, topRight, 4, false, true);
-
 	}
 
 	// nextPosition creation config helper
@@ -74,6 +76,7 @@ public class EnemyMoveAround : MonoBehaviour {
 		iTween.MoveTo (nextEnemy, p2);
 		iTween.MoveTo (nextEnemy, p3);
 		iTween.MoveTo (nextEnemy, p4);
+		spawnedEnemies[compledEnemiesCount] = nextEnemy;
 	}
 
 	// called after an enemy completes its path
@@ -82,14 +85,21 @@ public class EnemyMoveAround : MonoBehaviour {
 	// when a new wave is created 
 
 	void CanSendNextEnemy () {
-		if (currentEnemies < numberOfEnemies) {
-			currentEnemies++;
+		spawnedEnemiesCount++;
+		if (spawnedEnemiesCount < numberOfEnemies) {
 			this.spawnEnemy ();
 		}
 	}
 
 	void EnemyCompletedPath () {
-	
+		compledEnemiesCount ++;
+		if (compledEnemiesCount == numberOfEnemies) {
+			//next cycle of enemies
+			originDistance--;
+			if (originDistance > 0) { 
+				this.Start ();
+			}
+		}
 	}
 
 }
