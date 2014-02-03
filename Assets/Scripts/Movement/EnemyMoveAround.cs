@@ -10,7 +10,10 @@ public class EnemyMoveAround : MonoBehaviour {
 
 
 	private int currentEnemies;
-	private Hashtable ht;
+	private Hashtable p1;
+	private Hashtable p2;
+	private Hashtable p3;
+	private Hashtable p4;
 	private GameObject nextEnemy;
 
 	void Awake(){
@@ -33,20 +36,33 @@ public class EnemyMoveAround : MonoBehaviour {
 
 	// based on the origin position creates a new enemy path
 	void setEnemyPath () {
-		transform.position = new Vector3 (originDistance, originDistance, 0);
 		Vector3 topRight = new Vector3 (originDistance, originDistance, 0);
 		Vector3 topLeft = new Vector3 (-originDistance, originDistance, 0);
 		Vector3 botLeft = new Vector3 (-originDistance, -originDistance, 0);
 		Vector3 botRight = new Vector3 (originDistance, -originDistance, 0);
-		Vector3[] path = {topRight, topLeft, botLeft, botRight, topRight};
+		p1 = createPath (p1, topLeft, 1, true, false);
+		p2 = createPath (p2, botLeft, 2, false, false);
+		p3 = createPath (p3, botRight, 3, false, false);
+		p4 = createPath (p4, topRight, 4, false, true);
 
-		ht = new Hashtable();
-		ht.Add("path",path);
-		ht.Add("time",moveSpeed);
-		ht.Add("delay",1);
-		ht.Add("looptype",iTween.LoopType.none);
-		ht.Add("onstart", "CanSendNextEnemy");
-		ht.Add ("onstarttarget", this.gameObject);
+	}
+
+	// nextPosition creation config helper
+	Hashtable createPath (Hashtable nextPositionOptions, Vector3 nextPosition, double delay, bool startFuntion, bool completionFuntion) {
+		nextPositionOptions = new Hashtable();
+		nextPositionOptions.Add("position",nextPosition);
+		nextPositionOptions.Add("time",moveSpeed);
+		nextPositionOptions.Add("delay",delay);
+		nextPositionOptions.Add("looptype",iTween.LoopType.none);
+		if (startFuntion) {
+			nextPositionOptions.Add("onstart", "CanSendNextEnemy");
+			nextPositionOptions.Add ("onstarttarget", this.gameObject);
+		}
+		if (completionFuntion) {
+			nextPositionOptions.Add("oncomplete", "EnemyCompletedPath");
+			nextPositionOptions.Add ("oncompletetarget", this.gameObject);
+		}
+		return nextPositionOptions;
 	}
 		
 	// spawns a new anemie
@@ -54,7 +70,10 @@ public class EnemyMoveAround : MonoBehaviour {
 		nextEnemy = Instantiate(projectile, transform.position, transform.rotation) as GameObject;
 		nextEnemy.tag = "Enemy";
 		nextEnemy.transform.position = new Vector3(originDistance, originDistance, 0);
-		iTween.MoveTo (nextEnemy, ht);
+		iTween.MoveTo (nextEnemy, p1);
+		iTween.MoveTo (nextEnemy, p2);
+		iTween.MoveTo (nextEnemy, p3);
+		iTween.MoveTo (nextEnemy, p4);
 	}
 
 	// called after an enemy completes its path
@@ -63,17 +82,14 @@ public class EnemyMoveAround : MonoBehaviour {
 	// when a new wave is created 
 
 	void CanSendNextEnemy () {
-		if (numberOfEnemies == currentEnemies && originDistance > 2) {
-			originDistance -= 1.0f;
-			GameObject[] allEnemies = GameObject.FindGameObjectsWithTag("Enemy");
-			foreach (GameObject obj in allEnemies) {
-				DestroyObject(obj);
-			}
-			this.Start();
-		} else if (currentEnemies < numberOfEnemies) {
+		if (currentEnemies < numberOfEnemies) {
 			currentEnemies++;
 			this.spawnEnemy ();
 		}
+	}
+
+	void EnemyCompletedPath () {
+	
 	}
 
 }
