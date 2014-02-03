@@ -83,7 +83,6 @@ public class EnemyMoveAround : MonoBehaviour {
 	// if the enemy limit was not reached a new enemy is spawed
 	// otherwise if the originDistace is not to near from the player seends another wave of enemies
 	// when a new wave is created 
-
 	void CanSendNextEnemy () {
 		spawnedEnemiesCount++;
 		if (spawnedEnemiesCount < numberOfEnemies) {
