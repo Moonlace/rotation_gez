@@ -95,7 +95,7 @@ public class EnemyMoveAround : MonoBehaviour {
 		if (compledEnemiesCount == numberOfEnemies) {
 			//next cycle of enemies
 			originDistance--;
-			if (originDistance > 0) { 
+			if (originDistance >= 2) { 
 				this.Start ();
 			}
 		}
