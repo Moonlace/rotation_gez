@@ -7,15 +7,20 @@ public class EnemyMoveAround : MonoBehaviour {
 	public float moveSpeed;
 	public float originDistance;
 	public int numberOfEnemies;
+	public int spawnedEnemiesCount;
+	public int compledEnemiesCount;
+	public int killedEnemies;
 
-	private GameObject[] spawnedEnemies;
-	private int spawnedEnemiesCount;
-	private int compledEnemiesCount;
 	private Hashtable p1;
 	private Hashtable p2;
 	private Hashtable p3;
 	private Hashtable p4;
 	private GameObject nextEnemy;
+	public void killedAnEnemy() {
+		killedEnemies ++;
+		compledEnemiesCount ++;
+		this.shoudStartNextWave();
+	}
 
 	void Awake(){
 
@@ -25,7 +30,7 @@ public class EnemyMoveAround : MonoBehaviour {
 	// set the enemy position
 	// spawn a enemy
 	void Start () {
-		spawnedEnemies = new GameObject[numberOfEnemies];
+		killedEnemies = 0;
 		spawnedEnemiesCount = 0;
 		compledEnemiesCount = 0;
 		this.setEnemyPath ();
@@ -34,7 +39,6 @@ public class EnemyMoveAround : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
 	}
 
 	// based on the origin position creates a new enemy path
@@ -43,27 +47,23 @@ public class EnemyMoveAround : MonoBehaviour {
 		Vector3 topLeft = new Vector3 (-originDistance, originDistance, 0);
 		Vector3 botLeft = new Vector3 (-originDistance, -originDistance, 0);
 		Vector3 botRight = new Vector3 (originDistance, -originDistance, 0);
-		p1 = createPath (p1, topLeft, 1, true, false);
-		p2 = createPath (p2, botLeft, 2, false, false);
-		p3 = createPath (p3, botRight, 3, false, false);
-		p4 = createPath (p4, topRight, 4, false, true);
+		p1 = createPath (p1, topLeft, 1);
+		p2 = createPath (p2, botLeft, 2);
+		p3 = createPath (p3, botRight, 3);
+		p4 = createPath (p4, topRight, 4);
+		p1.Add("onstart", "CanSendNextEnemy");
+		p1.Add ("onstarttarget", this.gameObject);
+		p4.Add("oncomplete", "EnemyCompletedPath");
+		p4.Add ("oncompletetarget", this.gameObject);
 	}
 
 	// nextPosition creation config helper
-	Hashtable createPath (Hashtable nextPositionOptions, Vector3 nextPosition, double delay, bool startFuntion, bool completionFuntion) {
+	Hashtable createPath (Hashtable nextPositionOptions, Vector3 nextPosition, double delay) {
 		nextPositionOptions = new Hashtable();
 		nextPositionOptions.Add("position",nextPosition);
 		nextPositionOptions.Add("time",moveSpeed);
 		nextPositionOptions.Add("delay",delay);
 		nextPositionOptions.Add("looptype",iTween.LoopType.none);
-		if (startFuntion) {
-			nextPositionOptions.Add("onstart", "CanSendNextEnemy");
-			nextPositionOptions.Add ("onstarttarget", this.gameObject);
-		}
-		if (completionFuntion) {
-			nextPositionOptions.Add("oncomplete", "EnemyCompletedPath");
-			nextPositionOptions.Add ("oncompletetarget", this.gameObject);
-		}
 		return nextPositionOptions;
 	}
 		
@@ -76,8 +76,7 @@ public class EnemyMoveAround : MonoBehaviour {
 		iTween.MoveTo (nextEnemy, p1);
 		iTween.MoveTo (nextEnemy, p2);
 		iTween.MoveTo (nextEnemy, p3);
-		iTween.MoveTo (nextEnemy, p4);
-		spawnedEnemies[compledEnemiesCount] = nextEnemy; 
+		iTween.MoveTo (nextEnemy, p4); 
 	}
 
 	// called after an enemy completes its path
@@ -92,8 +91,21 @@ public class EnemyMoveAround : MonoBehaviour {
 	}
 
 	void EnemyCompletedPath () {
+		//destroy enemy that reached the finishe line :D
 		compledEnemiesCount ++;
-		if (compledEnemiesCount == numberOfEnemies) {
+		this.shoudStartNextWave();
+	} 
+
+	void shoudStartNextWave () {
+		if (compledEnemiesCount >= spawnedEnemiesCount && numberOfEnemies == spawnedEnemiesCount) {
+
+			numberOfEnemies -= killedEnemies;
+
+
+			foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Enemy")) {
+				DestroyObject (obj);
+			}
+
 			//next cycle of enemies
 			originDistance--;
 			if (originDistance >= 2) { 
@@ -111,9 +123,9 @@ public class EnemyMoveAround : MonoBehaviour {
 		case 2:
 			return new Color(73.0f/255.0f,153.0f/255.0f,56.0f/255.0f,1.0f); // return a green color
 		case 3:
-			return new Color(114.0f/255.0f,40.0f/255.0f,153.0f/255.0f,1.0f); // return a purple color
+			return new Color(84.0f/255.0f,21.0f/255.0f,116.0f/255.0f,1.0f); // return a purple color
 		default:
-			return new Color(245.0f/255.0f,253.0f/253.0f,57.0f/255.0f,1.0f); // return a yellow color
+			return new Color(245.0f/255.0f,253.0f/255.0f,57.0f/255.0f,1.0f); // return a yellow color
 		}
 	}
 }
