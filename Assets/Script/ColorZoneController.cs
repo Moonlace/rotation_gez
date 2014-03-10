@@ -29,11 +29,9 @@ public class ColorZoneController : MonoBehaviour {
 					continue;
 				}
 
-				Debug.Log(isObjectInArea(obj));
 				if (!this.isObjectInArea(obj)) {
 					continue;
 				}
-				Debug.Log("Passed");
 
 				Destroy(obj);
 				emaScript.killedAnEnemy();
