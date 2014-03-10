@@ -4,6 +4,7 @@ using System.Collections;
 public class EnemieController : MonoBehaviour {
 
 	public bool isColliding;
+	public int enemieTag;
 
 	// Use this for initialization
 	void Start () {

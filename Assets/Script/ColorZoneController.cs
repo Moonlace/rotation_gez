@@ -33,8 +33,7 @@ public class ColorZoneController : MonoBehaviour {
 					continue;
 				}
 
-				Destroy(obj);
-				emaScript.killedAnEnemy();
+				emaScript.killedAnEnemy(obj);
 				break;
 			}
 		}

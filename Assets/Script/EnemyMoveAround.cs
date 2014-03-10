@@ -11,12 +11,17 @@ public class EnemyMoveAround : MonoBehaviour {
 	public int compledEnemiesCount;
 	public int killedEnemies;
 
+	private GameObject[] createdEnemies;
 	private Hashtable p1;
 	private Hashtable p2;
 	private Hashtable p3;
 	private Hashtable p4;
-	private GameObject nextEnemy;
-	public void killedAnEnemy() {
+	private GameObject nextEnemy; 
+
+	public void killedAnEnemy(GameObject obj) {
+		EnemieController ec = obj.GetComponent<EnemieController>();
+		Destroy(obj);
+		createdEnemies [ec.enemieTag] = null;
 		killedEnemies ++;
 		compledEnemiesCount ++;
 		this.shoudStartNextWave();
@@ -26,19 +31,44 @@ public class EnemyMoveAround : MonoBehaviour {
 
 	}
 
-	// we have 0 enemies displaying
-	// set the enemy position
-	// spawn a enemy
+	//start game
 	void Start () {
+
+		// set counters to zero
 		killedEnemies = 0;
 		spawnedEnemiesCount = 0;
 		compledEnemiesCount = 0;
+
+		// create the path for the enemies
 		this.setEnemyPath ();
+
+		// create enemies
+		createdEnemies = new GameObject[numberOfEnemies];
+		for (int i = 0; i < numberOfEnemies; i ++) {
+			createdEnemies[i] = this.createEnemyWithTag(i);
+			Debug.Log (createdEnemies[i].renderer.material.color);
+		}
+
+		// start the spawning
 		this.spawnEnemy ();
 	}
 	
 	// Update is called once per frame
 	void Update () {
+
+	}
+
+	void NextWave () {
+
+		Debug.Log("starting next wave!");
+
+		// set counters to zero
+		killedEnemies = 0;
+		spawnedEnemiesCount = 0;
+		compledEnemiesCount = 0;
+
+		// start the spawning
+		this.spawnEnemy ();
 	}
 
 	// based on the origin position creates a new enemy path
@@ -67,49 +97,77 @@ public class EnemyMoveAround : MonoBehaviour {
 		return nextPositionOptions;
 	}
 		
-	// spawns a new anemie
-	void spawnEnemy () {
+	// create a new enemy
+	GameObject createEnemyWithTag (int tag) {
 		nextEnemy = Instantiate(projectile, transform.position, transform.rotation) as GameObject;
 		nextEnemy.tag = "Enemy";
 		nextEnemy.renderer.material.color = this.getRandomColor();
 		nextEnemy.transform.position = new Vector3(originDistance, originDistance, 0);
-		iTween.MoveTo (nextEnemy, p1);
-		iTween.MoveTo (nextEnemy, p2);
-		iTween.MoveTo (nextEnemy, p3);
-		iTween.MoveTo (nextEnemy, p4); 
+		EnemieController ec = nextEnemy.GetComponent<EnemieController>();
+		ec.enemieTag = tag;
+		return nextEnemy;
 	}
-
-	// called after an enemy completes its path
-	// if the enemy limit was not reached a new enemy is spawed
-	// otherwise if the originDistace is not to near from the player seends another wave of enemies
-	// when a new wave is created 
-	void CanSendNextEnemy () {
+	
+	// spawn a enemy
+	void spawnEnemy() {
+		GameObject obj;
+		while (createdEnemies[spawnedEnemiesCount] == null 
+		       && spawnedEnemiesCount != createdEnemies.Length) {
+			spawnedEnemiesCount++;
+		}
+		Debug.Log("going to spawn");
+		obj = createdEnemies [spawnedEnemiesCount];
 		spawnedEnemiesCount++;
+		iTween.MoveTo (obj, p1);
+		iTween.MoveTo (obj, p2);
+		iTween.MoveTo (obj, p3);
+		iTween.MoveTo (obj, p4);
+	}
+	
+	// called after an enemy leaves the first square
+	void CanSendNextEnemy () {
+
+		// checks if we reach the limite of enemies
 		if (spawnedEnemiesCount < numberOfEnemies) {
+			//spawns an enemy
 			this.spawnEnemy ();
 		}
 	}
 
+	// called after an enemy reaches the end of its path
 	void EnemyCompletedPath () {
-		//destroy enemy that reached the finishe line :D
+
+		//incremente the number of enemies to reach the end of the path
 		compledEnemiesCount ++;
+
+		// check if we can start a next wave
 		this.shoudStartNextWave();
 	} 
 
+
 	void shoudStartNextWave () {
+
+		// checks if the wave has ended
 		if (compledEnemiesCount >= spawnedEnemiesCount && numberOfEnemies == spawnedEnemiesCount) {
 
+			//reduces the number of enemies by the amount we killed
 			numberOfEnemies -= killedEnemies;
 
+//			// destroys all the enemies
+//			foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Enemy")) {
+//				DestroyObject (obj);
+//			}
 
-			foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Enemy")) {
-				DestroyObject (obj);
-			}
-
-			//next cycle of enemies
+			// makes the enemies closer to the origin
 			originDistance--;
+
+			// updates the enemy path with the new originDistance value
+			this.setEnemyPath();
+
+			// checks if the game should continue
 			if (originDistance >= 2) { 
-				this.Start ();
+				// starts a new wave
+				this.NextWave ();
 			}
 		}
 	}
