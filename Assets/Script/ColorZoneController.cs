@@ -3,13 +3,17 @@ using System.Collections;
 
 public class ColorZoneController : MonoBehaviour {
 
-	public Color sectionColor;
-
 	private EnemyMoveAround emaScript;
 	private GameObject enemyPreFab;
+	private SpriteRenderer mColorZone;
+	private GameObject specialColorZone;
+	private SpecialZone spcScript;
 
 	// Use this for initialization
 	void Start () {
+		mColorZone = (SpriteRenderer)this.gameObject.renderer;
+		specialColorZone = GameObject.FindGameObjectWithTag("SpecialZone");
+		spcScript = specialColorZone.GetComponent<SpecialZone>();
 		enemyPreFab = GameObject.FindGameObjectWithTag("Enemie");
 		emaScript = enemyPreFab.GetComponent<EnemyMoveAround>();
 	}
@@ -19,13 +23,15 @@ public class ColorZoneController : MonoBehaviour {
 
 	}
 	void OnMouseDown() {
+
 		if (Input.GetMouseButtonDown (0)) {
+
 			GameObject[] taggedGameObjects = GameObject.FindGameObjectsWithTag("Enemy"); 
 			
 			//find first object in the clicked area that are of the same color
 			foreach (GameObject obj in taggedGameObjects) {
 				
-				if (obj.renderer.material.color != sectionColor) {
+				if (obj.renderer.material.color != mColorZone.color) {
 					continue;
 				}
 
@@ -34,6 +40,21 @@ public class ColorZoneController : MonoBehaviour {
 				}
 
 				emaScript.killedAnEnemy(obj);
+				if (this.gameObject.name == "LeftButton") {
+					mColorZone.color = Color.white;
+					spcScript.numberOfMixes = 0;
+				} else {
+					SpriteRenderer spcRender = (SpriteRenderer)specialColorZone.renderer;
+					if (spcScript.numberOfMixes == 0) {
+						spcRender.color = obj.renderer.material.color;
+						spcScript.numberOfMixes ++;
+					}
+					else if (spcScript.numberOfMixes == 1) {
+						spcRender.color += obj.renderer.material.color;
+						spcScript.numberOfMixes = 0;
+					}
+				}
+
 				break;
 			}
 		}
@@ -45,13 +66,13 @@ public class ColorZoneController : MonoBehaviour {
 	}
 	
 	void OnTriggerEnter(Collider other) {
-		if (other.renderer.material.color == sectionColor) {
+		if (other.renderer.material.color == mColorZone.color) {
 			other.gameObject.SendMessage("enteredArea", null);
 		}
 	}
 
 	void OnTriggerExit(Collider other) {
-		if (other.renderer.material.color == sectionColor) {
+		if (other.renderer.material.color == mColorZone.color) {
 			other.gameObject.SendMessage("leftArea", null);
 		}
 	}

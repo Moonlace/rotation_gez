@@ -7,6 +7,7 @@ public class EnemyMoveAround : MonoBehaviour {
 	public float moveSpeed;
 	public float originDistance;
 	public int numberOfEnemies;
+	public int numberOfSpawnedEnemies;
 	public int spawnedEnemiesCount;
 	public int compledEnemiesCount;
 	public int killedEnemies;
@@ -36,6 +37,7 @@ public class EnemyMoveAround : MonoBehaviour {
 
 		// set counters to zero
 		killedEnemies = 0;
+		numberOfSpawnedEnemies = 0;
 		spawnedEnemiesCount = 0;
 		compledEnemiesCount = 0;
 
@@ -46,7 +48,6 @@ public class EnemyMoveAround : MonoBehaviour {
 		createdEnemies = new GameObject[numberOfEnemies];
 		for (int i = 0; i < numberOfEnemies; i ++) {
 			createdEnemies[i] = this.createEnemyWithTag(i);
-			Debug.Log (createdEnemies[i].renderer.material.color);
 		}
 
 		// start the spawning
@@ -64,6 +65,7 @@ public class EnemyMoveAround : MonoBehaviour {
 
 		// set counters to zero
 		killedEnemies = 0;
+		numberOfSpawnedEnemies = 0;
 		spawnedEnemiesCount = 0;
 		compledEnemiesCount = 0;
 
@@ -111,24 +113,27 @@ public class EnemyMoveAround : MonoBehaviour {
 	// spawn a enemy
 	void spawnEnemy() {
 		GameObject obj;
-		while (createdEnemies[spawnedEnemiesCount] == null 
-		       && spawnedEnemiesCount != createdEnemies.Length) {
+		while (spawnedEnemiesCount != createdEnemies.Length 
+		       && createdEnemies[spawnedEnemiesCount] == null) {
 			spawnedEnemiesCount++;
 		}
-		Debug.Log("going to spawn");
-		obj = createdEnemies [spawnedEnemiesCount];
-		spawnedEnemiesCount++;
-		iTween.MoveTo (obj, p1);
-		iTween.MoveTo (obj, p2);
-		iTween.MoveTo (obj, p3);
-		iTween.MoveTo (obj, p4);
+		if (spawnedEnemiesCount != createdEnemies.Length) { 
+			Debug.Log("going to spawn");
+			obj = createdEnemies [spawnedEnemiesCount];
+			spawnedEnemiesCount++;
+			numberOfSpawnedEnemies++;
+			iTween.MoveTo (obj, p1);
+			iTween.MoveTo (obj, p2);
+			iTween.MoveTo (obj, p3);
+			iTween.MoveTo (obj, p4);
+		}
 	}
 	
 	// called after an enemy leaves the first square
 	void CanSendNextEnemy () {
 
 		// checks if we reach the limite of enemies
-		if (spawnedEnemiesCount < numberOfEnemies) {
+		if (numberOfSpawnedEnemies < numberOfEnemies) {
 			//spawns an enemy
 			this.spawnEnemy ();
 		}
@@ -148,11 +153,11 @@ public class EnemyMoveAround : MonoBehaviour {
 	void shoudStartNextWave () {
 
 		// checks if the wave has ended
-		if (compledEnemiesCount >= spawnedEnemiesCount && numberOfEnemies == spawnedEnemiesCount) {
+		if (compledEnemiesCount >= numberOfSpawnedEnemies && numberOfEnemies == numberOfSpawnedEnemies) {
 
 			//reduces the number of enemies by the amount we killed
 			numberOfEnemies -= killedEnemies;
-
+			compledEnemiesCount = 0;
 //			// destroys all the enemies
 //			foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Enemy")) {
 //				DestroyObject (obj);
@@ -173,17 +178,18 @@ public class EnemyMoveAround : MonoBehaviour {
 	}
 
 	Color getRandomColor() {
+		return new Color(55.0f/255.0f,120.0f/255.0f,13.0f/255.0f,1.0f); // return a green color
 		int pickedColor = Random.Range(0, 4); // creates a number between 1 and 4
 		switch (pickedColor)
 		{
 		case 1:
-			return new Color(40.0f/255.0f,84.0f/255.0f,153.0f/255.0f,1.0f); // return a blue color
+			return new Color(172.0f/255.0f,24.0f/255.0f,24.0f/255.0f,1.0f); // return a red color
 		case 2:
-			return new Color(73.0f/255.0f,153.0f/255.0f,56.0f/255.0f,1.0f); // return a green color
+			return new Color(55.0f/255.0f,120.0f/255.0f,13.0f/255.0f,1.0f); // return a green color
 		case 3:
-			return new Color(84.0f/255.0f,21.0f/255.0f,116.0f/255.0f,1.0f); // return a purple color
+			return new Color(40.0f/255.0f,80.0f/255.0f,156.0f/255.0f,1.0f); // return a blue color
 		default:
-			return new Color(245.0f/255.0f,253.0f/255.0f,57.0f/255.0f,1.0f); // return a yellow color
+			return new Color(172.0f/255.0f,24.0f/255.0f,24.0f/255.0f,1.0f); // return a red color
 		}
 	}
 }
