@@ -118,7 +118,6 @@ public class EnemyMoveAround : MonoBehaviour {
 			spawnedEnemiesCount++;
 		}
 		if (spawnedEnemiesCount != createdEnemies.Length) { 
-			Debug.Log("going to spawn");
 			obj = createdEnemies [spawnedEnemiesCount];
 			spawnedEnemiesCount++;
 			numberOfSpawnedEnemies++;
@@ -178,18 +177,51 @@ public class EnemyMoveAround : MonoBehaviour {
 	}
 
 	Color getRandomColor() {
-		return new Color(55.0f/255.0f,120.0f/255.0f,13.0f/255.0f,1.0f); // return a green color
-		int pickedColor = Random.Range(0, 4); // creates a number between 1 and 4
+		// 6 special colors :)
+		int pickedColor = Random.Range(0, 10); // creates a number between 0 and 9
+		Debug.Log (pickedColor);
+		Color specialColor = this.getSpecialColor();
 		switch (pickedColor)
 		{
+		case 0:
 		case 1:
-			return new Color(172.0f/255.0f,24.0f/255.0f,24.0f/255.0f,1.0f); // return a red color
 		case 2:
-			return new Color(55.0f/255.0f,120.0f/255.0f,13.0f/255.0f,1.0f); // return a green color
+			return new Color(172.0f/255.0f,24.0f/255.0f,24.0f/255.0f,1.0f); // return a red color
 		case 3:
+		case 4:
+		case 5:
+			return new Color(55.0f/255.0f,120.0f/255.0f,13.0f/255.0f,1.0f); // return a green color
+		case 6:
+		case 7:
+		case 8:
 			return new Color(40.0f/255.0f,80.0f/255.0f,156.0f/255.0f,1.0f); // return a blue color
+		case 9:
+			//lets go special color
+			Debug.Log("SPECIAL SPAWN");
+			return specialColor;
 		default:
 			return new Color(172.0f/255.0f,24.0f/255.0f,24.0f/255.0f,1.0f); // return a red color
+		}
+	}
+			
+	Color getSpecialColor() {
+		int specialColor = Random.Range(0, 6); // creates a number between 0 and 5
+		switch (specialColor) 
+		{
+		case 0: 
+			return new Color(227.0f/255.0f,144.0f/255.0f,37.0f/255.0f,1.0f); // return a red + green
+		case 1: 
+			return new Color(212.0f/255.0f,104.0f/255.0f,180.0f/255.0f,1.0f); // return red + blue
+		case 2: 
+			return new Color(95.0f/255.0f,200.0f/255.0f,169.0f/255.0f,1.0f); // return green + blue
+		case 3: 
+			return new Color(344.0f/255.0f,48.0f/255.0f,48.0f/255.0f,1.0f); // return red + red
+		case 4: 
+			return new Color(110.0f/255.0f,240.0f/255.0f,26.0f/255.0f,1.0f); // return green + green
+		case 5: 
+			return new Color(80.0f/255.0f,160.0f/255.0f,312.0f/255.0f,1.0f); // return blue + blue
+		default:
+			return new Color(80.0f/255.0f,160.0f/255.0f,312.0f/255.0f,1.0f); // return blue + blue
 		}
 	}
 }
