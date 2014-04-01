@@ -11,13 +11,35 @@ public class EnemyMoveAround : MonoBehaviour {
 	public int spawnedEnemiesCount;
 	public int compledEnemiesCount;
 	public int killedEnemies;
+	public GameObject nextHUD1;
+	public GameObject nextHUD2;
+	public GameObject nextHUD3;
+	public GameObject nextHUD4;
+	public GameObject nextHUD5;
+	public GameObject nextHUD6;
+	public GameObject nextHUD7;
+	public GameObject nextHUD8;
+	public GameObject nextHUD9;
+	public GameObject nextHUD10;
+	public GameObject nextHUD11;
+	public GameObject nextHUD12;
+	public GameObject nextHUD13;
+	public GameObject nextHUD14;
+	public GameObject nextHUD15;
+	public GameObject nextHUD16;
+	public GameObject nextHUD17;
+	public GameObject nextHUD18;
+	public GameObject nextHUD19;
+	public GameObject nextHUD20;
 
+	private GameObject [] nextEnemies;
 	private GameObject[] createdEnemies;
 	private Hashtable p1;
 	private Hashtable p2;
 	private Hashtable p3;
 	private Hashtable p4;
 	private GameObject nextEnemy; 
+	public bool blackNextEnemieHUD;
 
 	public void killedAnEnemy(GameObject obj) {
 		EnemieController ec = obj.GetComponent<EnemieController>();
@@ -41,6 +63,30 @@ public class EnemyMoveAround : MonoBehaviour {
 		spawnedEnemiesCount = 0;
 		compledEnemiesCount = 0;
 
+		// get the next enemie HUD objects
+		blackNextEnemieHUD = false;
+		nextEnemies = new GameObject [20]{	nextHUD1,
+		                             		nextHUD2,
+		                             		nextHUD3,
+		                             		nextHUD4,
+		                             		nextHUD5,
+		                             		nextHUD6,
+		                             		nextHUD7,
+		                            		nextHUD8,
+		                             		nextHUD9,
+		                            	 	nextHUD10,
+		                           	  		nextHUD11,
+		                             		nextHUD12,
+		                             		nextHUD13,
+		                             		nextHUD14,
+		                             		nextHUD15,
+		                             		nextHUD16,
+		                             		nextHUD17,
+		                             		nextHUD18,
+		                             		nextHUD19,
+											nextHUD20
+										};
+
 		// create the path for the enemies
 		this.setEnemyPath ();
 
@@ -57,18 +103,33 @@ public class EnemyMoveAround : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+			int j = numberOfSpawnedEnemies-1;
+			Debug.Log (numberOfSpawnedEnemies);
+			for (int i = 0; i < nextEnemies.Length; i++) {
+				while (j != createdEnemies.Length 
+			    	   && createdEnemies[j] == null) {
+					j++;
+				}
+				if (j != createdEnemies.Length 
+			    && createdEnemies[j] != null && !blackNextEnemieHUD) { 
+					((SpriteRenderer)nextEnemies[i].renderer).color = createdEnemies[j].renderer.material.color;
+					j++;
+				}
+				else {
+					((SpriteRenderer)nextEnemies[i].renderer).color = Color.black;
+				}
+			}
+
 	}
 
 	void NextWave () {
-
-		Debug.Log("starting next wave!");
 
 		// set counters to zero
 		killedEnemies = 0;
 		numberOfSpawnedEnemies = 0;
 		spawnedEnemiesCount = 0;
 		compledEnemiesCount = 0;
-
+		blackNextEnemieHUD = false;
 		// start the spawning
 		this.spawnEnemy ();
 	}
@@ -135,6 +196,9 @@ public class EnemyMoveAround : MonoBehaviour {
 		if (numberOfSpawnedEnemies < numberOfEnemies) {
 			//spawns an enemy
 			this.spawnEnemy ();
+		} else {
+			// in order to for the next enemies hud to go go full black
+			blackNextEnemieHUD = true;
 		}
 	}
 
@@ -179,7 +243,6 @@ public class EnemyMoveAround : MonoBehaviour {
 	Color getRandomColor() {
 		// 6 special colors :)
 		int pickedColor = Random.Range(0, 10); // creates a number between 0 and 9
-		Debug.Log (pickedColor);
 		Color specialColor = this.getSpecialColor();
 		switch (pickedColor)
 		{
@@ -196,8 +259,6 @@ public class EnemyMoveAround : MonoBehaviour {
 		case 8:
 			return new Color(40.0f/255.0f,80.0f/255.0f,156.0f/255.0f,1.0f); // return a blue color
 		case 9:
-			//lets go special color
-			Debug.Log("SPECIAL SPAWN");
 			return specialColor;
 		default:
 			return new Color(172.0f/255.0f,24.0f/255.0f,24.0f/255.0f,1.0f); // return a red color
