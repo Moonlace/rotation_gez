@@ -30,7 +30,12 @@ public class ColorZoneController : MonoBehaviour {
 			
 			//find first object in the clicked area that are of the same color
 			foreach (GameObject obj in taggedGameObjects) {
-				
+
+				Debug.Log("zone colo");
+				Debug.Log(obj.renderer.material.color);
+				Debug.Log("object zone");
+				Debug.Log(mColorZone.color);
+
 				if (obj.renderer.material.color != mColorZone.color) {
 					continue;
 				}
@@ -50,7 +55,12 @@ public class ColorZoneController : MonoBehaviour {
 						spcScript.numberOfMixes ++;
 					}
 					else if (spcScript.numberOfMixes == 1) {
-						spcRender.color += obj.renderer.material.color;
+
+
+						spcRender.color = new Color(spcRender.color.r + obj.renderer.material.color.r,
+						                            spcRender.color.g + obj.renderer.material.color.g,
+						                            spcRender.color.b + obj.renderer.material.color.b,
+						                            1.0f);
 						spcScript.numberOfMixes = 0;
 					}
 				}
